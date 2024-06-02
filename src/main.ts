@@ -3,6 +3,7 @@ import path from 'path';
 import { menu } from './menu';
 import { handleShowContextMenu } from './contextMenu';
 import { createOpenDialogHandler } from './dialog';
+import windowStateKeeper from 'electron-window-state';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -12,9 +13,16 @@ if (require('electron-squirrel-startup')) {
 let isRegistered = false;
 
 const createWindow = () => {
+  const windowState = windowStateKeeper({
+    defaultWidth: 800,
+    defaultHeight: 640,
+  });
+
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: windowState.width,
+    height: windowState.height,
+    x: windowState.x,
+    y: windowState.y,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
@@ -34,6 +42,7 @@ const createWindow = () => {
     mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
   }
   mainWindow.webContents.openDevTools();
+  windowState.manage(mainWindow);
 };
 
 app.on('ready', createWindow);
