@@ -1,5 +1,6 @@
-import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, Menu } from 'electron';
 import path from 'path';
+import { menu } from './menu';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -33,6 +34,33 @@ const createWindow = () => {
         .catch((err) => console.error(err))
     );
   });
+
+  Menu.setApplicationMenu(menu);
+
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: 'File',
+      submenu: [
+        {
+          label: 'Close',
+          accelerator: 'CmdOrCtrl+W',
+          role: 'close',
+        },
+      ],
+    },
+    {
+      label: 'Help',
+      submenu: [
+        {
+          label: 'Console Log',
+          click: () => console.log('context-menu'),
+        },
+      ],
+    },
+  ]);
+
+  // 'show-context-menu' チャンネルに受信があればポップアップメニューを表示
+  ipcMain.handle('show-context-menu', () => contextMenu.popup());
 
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {

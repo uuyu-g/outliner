@@ -5,4 +5,5 @@ import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('myAPI', {
   openDialog: () => ipcRenderer.invoke('open-dialog'),
+  showContextMenu: () => ipcRenderer.invoke('show-context-menu'),
 });

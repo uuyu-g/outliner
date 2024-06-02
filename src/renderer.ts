@@ -30,3 +30,10 @@ import './index.css';
 import './app';
 
 console.log('👋 This message is being logged by "renderer.ts", included via Vite');
+
+window.addEventListener('contextmenu', (e) => {
+  // ブラウザのデフォルトの挙動をキャンセル（必須）
+  e.preventDefault();
+  // プリロードスクリプトに登録されたメソッドを呼び出し
+  myAPI.showContextMenu();
+});
