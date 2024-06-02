@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import path from 'path';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -14,6 +14,24 @@ const createWindow = () => {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
+  });
+
+  ipcMain.handle('open-dialog', async (_e, _arg) => {
+    return (
+      dialog
+        // ファイル選択ダイアログを表示する
+        .showOpenDialog(mainWindow, {
+          properties: ['openFile'],
+        })
+        .then((result) => {
+          // キャンセルボタンが押されたとき
+          if (result.canceled) return '';
+
+          // 選択されたファイルの絶対パスを返す
+          return result.filePaths[0];
+        })
+        .catch((err) => console.error(err))
+    );
   });
 
   // and load the index.html of the app.
